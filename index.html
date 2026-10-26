@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miniproject Kalkulator Bangun Ruang</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 650px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .input-field {
+            margin-bottom: 15px;
+        }
+        button {
+            width: 100%;
+            background-color: #2980b9;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #1f618d;
+        }
+        .result-box {
+            margin-top: 25px;
+            background: #eaf2f8;
+            border-left: 5px solid #2980b9;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .result-box h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Kalkulator 8 Bangun Ruang</h2>
+    
+    <div class="form-group">
+        <label for="pilihBangun">Pilih Bangun Ruang:</label>
+        <select id="pilihBangun" onchange="tampilkanForm()">
+            <option value="kubus">1. Kubus</option>
+            <option value="balok">2. Balok</option>
+            <option value="tabung">3. Tabung</option>
+            <option value="bola">4. Bola</option>
+            <option value="kerucut">5. Kerucut</option>
+            <option value="limas">6. Limas Segi Empat</option>
+            <option value="prisma">7. Prisma Segitiga</option>
+            <option value="kerucut_pancut">8. Kerucut Terpancung / Bola Pejal (Ganti: Kerucut)</option> <!-- Minimal 8 -->
+        </select>
+    </div>
+
+    <!-- Container Input Dinamis -->
+    <div id="formInputs"></div>
+
+    <button onclick="hitung()">Hitung Hasil</button>
+
+    <div class="result-box" id="boxHasil">
+        <h3>Hasil Perhitungan:</h3>
+        <p id="teksHasil">Silakan masukkan angka dan klik tombol hitung.</p>
+    </div>
+</div>
+
+<script>
+    // Fungsi untuk mengubah kotak input sesuai pilihan bangun ruang
+    function tampilkanForm() {
+        const pilihan = document.getElementById("pilihBangun").value;
+        const container = document.getElementById("formInputs");
+        let html = "";
+
+        if (pilihan === "kubus") {
+            html = `<div class="input-field"><label>Sisi (s):</label><input type="number" id="sisi" placeholder="Masukkan panjang sisi"></div>`;
+        } else if (pilihan === "balok") {
+            html = `
+                <div class="input-field"><label>Panjang (p):</label><input type="number" id="panjang" placeholder="Panjang"></div>
+                <div class="input-field"><label>Lebar (l):</label><input type="number" id="lebar" placeholder="Lebar"></div>
+                <div class="input-field"><label>Tinggi (t):</label><input type="number" id="tinggi" placeholder="Tinggi"></div>
+            `;
+        } else if (pilihan === "tabung") {
+            html = `
+                <div class="input-field"><label>Jari-jari (r):</label><input type="number" id="jari" placeholder="Jari-jari alas"></div>
+                <div class="input-field"><label>Tinggi (t):</label><input type="number" id="tinggi" placeholder="Tinggi tabung"></div>
+            `;
+        } else if (pilihan === "bola") {
+            html = `<div class="input-field"><label>Jari-jari (r):</label><input type="number" id="jari" placeholder="Jari-jari bola"></div>`;
+        } else if (pilihan === "kerucut") {
+            html = `
+                <div class="input-field"><label>Jari-jari (r):</label><input type="number" id="jari" placeholder="Jari-jari alas"></div>
+                <div class="input-field"><label>Tinggi (t):</label><input type="number" id="tinggi" placeholder="Tinggi kerucut"></div>
+                <div class="input-field"><label>Garis Pelukis (s):</label><input type="number" id="pelukis" placeholder="Garis pelukis (s)"></div>
+            `;
+        } else if (pilihan === "limas") {
+            html = `
+                <div class="input-field"><label>Panjang Alas (p):</label><input type="number" id="panjang" placeholder="Panjang alas"></div>
+                <div class="input-field"><label>Lebar Alas (l):</label><input type="number" id="lebar" placeholder="Lebar alas"></div>
+                <div class="input-field"><label>Tinggi Limas (t):</label><input type="number" id="tinggi" placeholder="Tinggi limas"></div>
+            `;
+        } else if (pilihan === "prisma") {
+            html = `
+                <div class="input-field"><label>Alas Segitiga (a):</label><input type="number" id="alas" placeholder="Alas segitiga"></div>
+                <div class="input-field"><label>Tinggi Segitiga (ts):</label><input type="number" id="tinggiSegitiga" placeholder="Tinggi segitiga"></div>
+                <div class="input-field"><label>Tinggi Prisma (tp):</label><input type="number" id="tinggiPrisma" placeholder="Tinggi prisma"></div>
+            `;
+        } else if (pilihan === "kerucut_pancut") {
+            html = `
+                <div class="input-field"><label>Sisi Alas (s):</label><input type="number" id="sisiAlas" placeholder="Sisi alas kubus/limas tambahan"></div>
+                <div class="input-field"><label>Tinggi (t):</label><input type="number" id="tinggi" placeholder="Tinggi"></div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
+    // Jalankan saat pertama kali dibuka
+    window.onload = tampilkanForm;
+
+    // Fungsi Hitung Utama
+    function hitung() {
+        const pilihan = document.getElementById("pilihBangun").value;
+        let volume = 0;
+        let luas = 0;
+        let namaBangun = "";
+
+        if (pilihan === "kubus") {
+            let s = parseFloat(document.getElementById("sisi").value);
+            if(isNaN(s)) { alert("Mohon masukkan angka sisi dengan benar!"); return; }
+            namaBangun = "Kubus";
+            volume = Math.pow(s, 3);
+            luas = 6 * Math.pow(s, 2);
+        } else if (pilihan === "balok") {
+            let p = parseFloat(document.getElementById("panjang").value);
+            let l = parseFloat(document.getElementById("lebar").value);
+            let t = parseFloat(document.getElementById("tinggi").value);
+            if(isNaN(p) || isNaN(l) || isNaN(t)) { alert("Mohon isi semua nilai balok!"); return; }
+            namaBangun = "Balok";
+            volume = p * l * t;
+            luas = 2 * (p*l + p*t + l*t);
+        } else if (pilihan === "tabung") {
+            let r = parseFloat(document.getElementById("jari").value);
+            let t = parseFloat(document.getElementById("tinggi").value);
+            if(isNaN(r) || isNaN(t)) { alert("Mohon isi jari-jari dan tinggi tabung!"); return; }
+            namaBangun = "Tabung";
+            volume = Math.PI * Math.pow(r, 2) * t;
+            luas = 2 * Math.PI * r * (r + t);
+        } else if (pilihan === "bola") {
+            let r = parseFloat(document.getElementById("jari").value);
+            if(isNaN(r)) { alert("Mohon masukkan jari-jari bola!"); return; }
+            namaBangun = "Bola";
+            volume = (4/3) * Math.PI * Math.pow(r, 3);
+            luas = 4 * Math.PI * Math.pow(r, 2);
+        } else if (pilihan === "kerucut") {
+            let r = parseFloat(document.getElementById("jari").value);
+            let t = parseFloat(document.getElementById("tinggi").value);
+            let s = parseFloat(document.getElementById("pelukis").value);
+            if(isNaN(r) || isNaN(t) || isNaN(s)) { alert("Mohon isi data kerucut dengan lengkap!"); return; }
+            namaBangun = "Kerucut";
+            volume = (1/3) * Math.PI * Math.pow(r, 2) * t;
+            luas = Math.PI * r * (r + s);
+        } else if (pilihan === "limas") {
+            let p = parseFloat(document.getElementById("panjang").value);
+            let l = parseFloat(document.getElementById("lebar").value);
+            let t = parseFloat(document.getElementById("tinggi").value);
+            if(isNaN(p) || isNaN(l) || isNaN(t)) { alert("Mohon isi data limas dengan lengkap!"); return; }
+            namaBangun = "Limas Segi Empat";
+            let luasAlas = p * l;
+            volume = (1/3) * luasAlas * t;
+            // Perkiraan luas permukaan sederhana
+            let sisiMiring1 = Math.sqrt(Math.pow(t, 2) + Math.pow(l/2, 2));
+            let sisiMiring2 = Math.sqrt(Math.pow(t, 2) + Math.pow(p/2, 2));
+            luas = luasAlas + (p * sisiMiring1) + (l * sisiMiring2);
+        } else if (pilihan === "prisma") {
+            let a = parseFloat(document.getElementById("alas").value);
+            let ts = parseFloat(document.getElementById("tinggiSegitiga").value);
+            let tp = parseFloat(document.getElementById("tinggiPrisma").value);
+            if(isNaN(a) || isNaN(ts) || isNaN(tp)) { alert("Mohon isi data prisma segitiga!"); return; }
+            namaBangun = "Prisma Segitiga";
+            let luasAlas = 0.5 * a * ts;
+            volume = luasAlas * tp;
+            // Keliling alas segitiga siku-siku (asumsi sederhana)
+            let sisiMiring = Math.sqrt(Math.pow(a, 2) + Math.pow(ts, 2));
+            let kelilingAlas = a + ts + sisiMiring;
+            luas = (2 * luasAlas) + (kelilingAlas * tp);
+        } else if (pilihan === "kerucut_pancut") {
+            let s = parseFloat(document.getElementById("sisiAlas").value);
+            let t = parseFloat(document.getElementById("tinggi").value);
+            if(isNaN(s) || isNaN(t)) { alert("Mohon isi data dengan benar!"); return; }
+            namaBangun = "Limas Segitiga / Alternatif";
+            volume = (1/3) * (s * s) * t;
+            luas = (s * s) + (4 * (0.5 * s * t));
+        }
+
+        // Format hasil ke 2 angka di belakang koma
+        let hasilTeks = `Bangun Ruang: <b>${namaBangun}</b><br>
+                         Volume: <b>${volume.toFixed(2)}</b><br>
+                         Luas Permukaan: <b>${luas.toFixed(2)}</b>`;
+        
+        // Tampilkan di teks layar
+        document.getElementById("teksHasil").innerHTML = hasilTeks;
+
+        // Tampilkan dalam bentuk Alert (Sesuai Ketentuan No. 2)
+        alert(`=== HASIL PERHITUNGAN ${namaBangun.toUpperCase()} ===\nVolume: ${volume.toFixed(2)}\nLuas Permukaan: ${luas.toFixed(2)}`);
+    }
+</script>
+
+</body>
+</html>
